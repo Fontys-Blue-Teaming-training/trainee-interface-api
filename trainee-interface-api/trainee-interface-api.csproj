@@ -5,5 +5,10 @@
     <RootNamespace>trainee_interface_api</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.12" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="5.0.2" />
+  </ItemGroup>
+
 
 </Project>

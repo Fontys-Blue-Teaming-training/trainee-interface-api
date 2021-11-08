@@ -6,6 +6,8 @@ namespace trainee_interface_api.Models
 {
     public class FlagCompleted
     {
+        [Key, Required]
+        public int Id { get; set; }
         [Required]
         public Flag CompletedFlag { get; set; }
         [Required]

@@ -56,10 +56,22 @@ namespace trainee_interface_api.Controllers
                 return BadRequest(new ApiResponse<string>(false, "Flag incorrect!"));
             }
 
+            var startedScenario = await _dbContext.StartedScenarios.Where(x => x.Team.Id == team.Id && x.Scenario.Id == flag.ScenarioId).FirstOrDefaultAsync();
+            if(startedScenario == default)
+            {
+                return BadRequest(new ApiResponse<string>(false, "Scenario is not started for this training yet!"));
+            }
+
+            if (startedScenario.EndTime != null)
+            {
+                return BadRequest(new ApiResponse<string>(false, "Team has already completed this scenario!"));
+            }
+
             if (await _dbContext.FlagsCompleted.AnyAsync(x => x.Team.Id == team.Id && x.CompletedFlag.Id == flag.Id))
             {
                 return BadRequest(new ApiResponse<string>(false, "Flag is already completed!"));
             }
+
 
             await _dbContext.FlagsCompleted.AddAsync(new FlagCompleted() { Team = team, CompletedFlag = flag });
             await _dbContext.SaveChangesAsync();

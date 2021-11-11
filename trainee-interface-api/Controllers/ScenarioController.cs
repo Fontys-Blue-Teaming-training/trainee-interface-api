@@ -24,8 +24,44 @@ namespace trainee_interface_api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetScenarios()
         {
-
             return Ok(new ApiResponse<List<Scenario>>(true, await _dbContext.Scenarios.ToListAsync()));
+        }
+        
+        [HttpGet("highscore/{scenarioId}")]
+        public async Task<IActionResult> GetHighscoreByScenarioId(int scenarioId)
+        {
+            if(scenarioId < 1)
+            {
+                return BadRequest(new ApiResponse<string>(false, "ScenarioId is incorrect"));
+            }
+
+            if(!await _dbContext.Scenarios.AnyAsync(x => x.Id == scenarioId))
+            {
+                return BadRequest(new ApiResponse<string>(false, "ScenarioId does not exist"));
+            }
+
+            var highscore = new List<HighscoreEntry>();
+
+            foreach (var completedFlag in await _dbContext.FlagsCompleted.Where(x => x.CompletedFlag.ScenarioId == scenarioId).ToListAsync())
+            {
+                var teamIndex = highscore.FindIndex(x => x.TeamName == completedFlag.Team.Name);
+                if (teamIndex < 0)
+                {
+                    highscore.Add(new HighscoreEntry()
+                    {
+                        TeamName = completedFlag.Team.Name,
+                        Points = completedFlag.CompletedFlag.Points,
+                        AmountOfFlags = 1
+                    });
+                }
+                else
+                {
+                    highscore[teamIndex].AmountOfFlags++;
+                    highscore[teamIndex].Points += completedFlag.CompletedFlag.Points;
+                }
+            }
+
+            return Ok(new ApiResponse<List<HighscoreEntry>>(true, highscore));
         }
 
         [HttpPost]

@@ -28,7 +28,7 @@ namespace trainee_interface_api.Controllers
             {
                 flag.FlagCode = "";
             }
-            return Ok(flags);
+            return Ok(new ApiResponse<List<Flag>>(true, flags));
         }
 
         [HttpPost]
@@ -36,29 +36,29 @@ namespace trainee_interface_api.Controllers
         {
             if (completeFlag == default)
             {
-                return BadRequest("CompleteFlag cannot be empty!");
+                return BadRequest(new ApiResponse<string>(false, "CompleteFlag cannot be empty!"));
             }
 
             if (completeFlag.TeamId < 0 || string.IsNullOrWhiteSpace(completeFlag.FlagCode))
             {
-                return BadRequest("FlagId cannot be 0 or flagcode cannot be empty!");
+                return BadRequest(new ApiResponse<string>(false, "FlagId cannot be 0 or flagcode cannot be empty!"));
             }
 
             var team = await _dbContext.Teams.FirstOrDefaultAsync(x => x.Id == completeFlag.TeamId);
             if (team == default)
             {
-                return BadRequest("TeamId does not exist!");
+                return BadRequest(new ApiResponse<string>(false, "TeamId does not exist!"));
             }
 
             var flag = await _dbContext.Flags.FirstOrDefaultAsync(x => x.FlagCode == completeFlag.FlagCode);
             if (flag == default)
             {
-                return BadRequest("Flag incorrect!");
+                return BadRequest(new ApiResponse<string>(false, "Flag incorrect!"));
             }
 
             if (await _dbContext.FlagsCompleted.AnyAsync(x => x.Team.Id == team.Id && x.CompletedFlag.Id == flag.Id))
             {
-                return BadRequest("Flag is already completed!");
+                return BadRequest(new ApiResponse<string>(false, "Flag is already completed!"));
             }
 
             await _dbContext.FlagsCompleted.AddAsync(new FlagCompleted() { Team = team, CompletedFlag = flag });
@@ -76,8 +76,7 @@ namespace trainee_interface_api.Controllers
 
                 teamFlagStatus.Add(strippedFlag);
             }
-
-            return Ok(teamFlagStatus);
+            return Ok(new ApiResponse<List<TeamFlagStatus>>(true, teamFlagStatus));
         }
     }
 }

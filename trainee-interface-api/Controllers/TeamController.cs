@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using trainee_interface_api.Contexts;
 using trainee_interface_api.Models;
+using trainee_interface_api.Models.DTO;
 
 namespace trainee_interface_api.Controllers
 {
@@ -23,7 +24,7 @@ namespace trainee_interface_api.Controllers
         public async Task<ActionResult<IEnumerable<Team>>> GetTeams()
         {
             var result = await _dbContext.Teams.ToListAsync();
-            return Ok(result);
+            return Ok(new ApiResponse<List<Team>>(true, result));
         }
 
         [HttpGet("results")]
@@ -34,7 +35,7 @@ namespace trainee_interface_api.Controllers
             {
                 result.CompletedFlag.FlagCode = "";
             }
-            return Ok(results);
+            return Ok(new ApiResponse<List<FlagCompleted>>(true, results));
         }
 
         [HttpGet("results/{teamId}")]
@@ -45,7 +46,7 @@ namespace trainee_interface_api.Controllers
             {
                 result.CompletedFlag.FlagCode = "";
             }
-            return Ok(results);
+            return Ok(new ApiResponse<List<FlagCompleted>>(true, results));
         }
 
         [HttpPost]
@@ -53,23 +54,23 @@ namespace trainee_interface_api.Controllers
         {
             if(team == default)
             {
-                return BadRequest("Object cannot be null!");
+                return BadRequest(new ApiResponse<string>(false, "Object cannot be null!"));
             }
 
             if(string.IsNullOrEmpty(team.Name))
             {
-                return BadRequest("Teamname cannot be empty!");
+                return BadRequest(new ApiResponse<string>(false, "Teamname cannot be empty!"));
             }
 
             if(await _dbContext.Teams.AnyAsync(x => x.Name == team.Name))
             {
-                return BadRequest("Teamname already exists!");
+                return BadRequest(new ApiResponse<string>(false, "Teamname already exists!"));
             }
 
             await _dbContext.AddAsync(team);
             await _dbContext.SaveChangesAsync();
 
-            return Ok(team);
+            return Ok(new ApiResponse<Team>(true, team));
         }
     }
 }

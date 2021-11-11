@@ -11,11 +11,12 @@ namespace trainee_interface_api.Contexts
         public DbSet<FlagCompleted> FlagsCompleted { get; set; }
         public DbSet<Scenario> Scenarios { get; set; }
         public DbSet<Team> Teams { get; set; }
+        public DbSet<StartedScenario> StartedScenarios { get; set; }
 
         // Change this
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            var connectionString = "server=localhost;user=<username>;password=<password>;database=<database>";
+            var connectionString = "server=localhost;user=root;password=redteamingdatabase;database=redteamingdb";
             optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
             optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
             optionsBuilder.EnableSensitiveDataLogging();

@@ -53,17 +53,17 @@ namespace trainee_interface_api.Controllers
         {
             if(team == default)
             {
-                return BadRequest();
+                return BadRequest("Object cannot be null!");
             }
 
             if(string.IsNullOrEmpty(team.Name))
             {
-                return BadRequest();
+                return BadRequest("Teamname cannot be empty!");
             }
 
             if(await _dbContext.Teams.AnyAsync(x => x.Name == team.Name))
             {
-                return BadRequest();
+                return BadRequest("Teamname already exists!");
             }
 
             await _dbContext.AddAsync(team);

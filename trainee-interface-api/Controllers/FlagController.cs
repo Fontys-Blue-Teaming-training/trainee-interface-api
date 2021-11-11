@@ -36,29 +36,29 @@ namespace trainee_interface_api.Controllers
         {
             if (completeFlag == default)
             {
-                return BadRequest();
+                return BadRequest("CompleteFlag cannot be empty!");
             }
 
             if (completeFlag.TeamId < 0 || string.IsNullOrWhiteSpace(completeFlag.FlagCode))
             {
-                return BadRequest();
+                return BadRequest("FlagId cannot be 0 or flagcode cannot be empty!");
             }
 
             var team = await _dbContext.Teams.FirstOrDefaultAsync(x => x.Id == completeFlag.TeamId);
             if (team == default)
             {
-                return BadRequest();
+                return BadRequest("TeamId does not exist!");
             }
 
             var flag = await _dbContext.Flags.FirstOrDefaultAsync(x => x.FlagCode == completeFlag.FlagCode);
             if (flag == default)
             {
-                return BadRequest();
+                return BadRequest("Flag incorrect!");
             }
 
             if (await _dbContext.FlagsCompleted.AnyAsync(x => x.Team.Id == team.Id && x.CompletedFlag.Id == flag.Id))
             {
-                return BadRequest();
+                return BadRequest("Flag is already completed!");
             }
 
             await _dbContext.FlagsCompleted.AddAsync(new FlagCompleted() { Team = team, CompletedFlag = flag });

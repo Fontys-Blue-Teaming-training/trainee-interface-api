@@ -29,7 +29,7 @@ namespace trainee_interface_api
             services.AddDbContext<DatabaseContext>();
 
             using var databaseContext = new DatabaseContext();
-            databaseContext.Database.EnsureDeleted();
+            // databaseContext.Database.EnsureDeleted();
             databaseContext.Database.EnsureCreated();
         }
 

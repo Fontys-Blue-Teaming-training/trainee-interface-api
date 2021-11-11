@@ -42,7 +42,7 @@ namespace trainee_interface_api.Controllers
 
             var highscore = new List<HighscoreEntry>();
 
-            foreach (var completedFlag in await _dbContext.FlagsCompleted.Where(x => x.CompletedFlag.ScenarioId == scenarioId).ToListAsync())
+            foreach (var completedFlag in await _dbContext.FlagsCompleted.Include(x => x.CompletedFlag).Include(x => x.Team).Where(x => x.CompletedFlag.ScenarioId == scenarioId).ToListAsync())
             {
                 var teamIndex = highscore.FindIndex(x => x.TeamName == completedFlag.Team.Name);
                 if (teamIndex < 0)
@@ -61,11 +61,41 @@ namespace trainee_interface_api.Controllers
                 }
             }
 
+            highscore = highscore.OrderBy(x => x.Points).ToList()s;
+
             return Ok(new ApiResponse<List<HighscoreEntry>>(true, highscore));
         }
 
+        [HttpGet("leaderboard/{scenarioId}")]
+        public async Task<IActionResult> GetLeaderboardByScenarioId(int scenarioId)
+        {
+            if (scenarioId < 1)
+            {
+                return BadRequest(new ApiResponse<string>(false, "ScenarioId is incorrect"));
+            }
+
+            if (!await _dbContext.Scenarios.AnyAsync(x => x.Id == scenarioId))
+            {
+                return BadRequest(new ApiResponse<string>(false, "ScenarioId does not exist"));
+            }
+
+            var leaderboard = new List<LeaderboardEntry>();
+            foreach (var completedFlag in await _dbContext.FlagsCompleted.Include(x => x.CompletedFlag).Include(x => x.Team).Where(x => x.CompletedFlag.ScenarioId == scenarioId).ToListAsync())
+            {
+                leaderboard.Add(new LeaderboardEntry()
+                {
+                    CompleteDate = completedFlag.Completed,
+                    FlagId = completedFlag.CompletedFlag.Id,
+                    Points = completedFlag.CompletedFlag.Points,
+                    TeamId = completedFlag.Team.Id
+                });
+            }
+         
+            return Ok(new ApiResponse<List<LeaderboardEntry>>(true, leaderboard));
+        }
+
         [HttpPost]
-        public async Task<IActionResult> StartScenario(ToggleScenario toggleScenario)
+        public async Task<IActionResult> ToggleScenario(ToggleScenario toggleScenario)
         {
             if (toggleScenario == default)
             {

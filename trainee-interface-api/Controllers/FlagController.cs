@@ -66,9 +66,9 @@ namespace trainee_interface_api.Controllers
 
             var teamFlagStatus = new List<TeamFlagStatus>();
 
-            foreach (var iFlag in _dbContext.Flags.Where(x => x.ScenarioId == flag.ScenarioId))
+            foreach (var iFlag in await _dbContext.Flags.Where(x => x.ScenarioId == flag.ScenarioId).ToListAsync())
             {
-                var strippedFlag = new TeamFlagStatus() { Flag = iFlag, IsCompleted = await _dbContext.FlagsCompleted.AnyAsync(x => x.Team.Id == team.Id && x.CompletedFlag.Id == flag.Id) };
+                var strippedFlag = new TeamFlagStatus() { Flag = iFlag, IsCompleted = await _dbContext.FlagsCompleted.AnyAsync(x => x.Team.Id == team.Id && x.CompletedFlag.Id == iFlag.Id) };
                 if(!strippedFlag.IsCompleted)
                 {
                     strippedFlag.Flag.FlagCode = "";

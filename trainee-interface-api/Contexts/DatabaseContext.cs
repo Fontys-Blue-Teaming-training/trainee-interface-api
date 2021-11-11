@@ -30,10 +30,6 @@ namespace trainee_interface_api.Contexts
                 .HasIndex(p => new { p.Name })
                 .IsUnique(true);
 
-            modelBuilder.Entity<FlagCompleted>()
-                .HasNoKey();
-
-
             modelBuilder.Entity<Scenario>()
                 .HasData(
                     new Scenario() { Id = 1, Name = "SSH Bruteforce" },
@@ -42,7 +38,8 @@ namespace trainee_interface_api.Contexts
 
             modelBuilder.Entity<Flag>()
                 .HasData(
-                    new Flag() { Id = 1, Description = "Test flag", Points = 1000, FlagCode = "BLUETEAM{TH1S_1S_4_FL4G}", ScenarioId = 1 }
+                    new Flag() { Id = 1, Description = "Test flag", Points = 1000, FlagCode = "BLUETEAM{TH1S_1S_4_FL4G}", ScenarioId = 1 },
+                    new Flag() { Id = 2, Description = "Second flag", Points = 1500, FlagCode = "BLUETEAM{S3C0ND_FL4G_LM40}", ScenarioId = 1 }
                 );
         }
     }

@@ -20,13 +20,6 @@ namespace trainee_interface_api.Controllers
             _dbContext = dbContext;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Team>>> GetTeams()
-        {
-            var result = await _dbContext.Teams.ToListAsync();
-            return Ok(new ApiResponse<List<Team>>(true, result));
-        }
-
         [HttpGet("results")]
         public async Task<IActionResult> GetTeamResults()
         {

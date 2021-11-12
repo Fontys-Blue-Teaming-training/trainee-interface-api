@@ -86,6 +86,7 @@ namespace trainee_interface_api.Controllers
                 {
                     CompleteDate = completedFlag.Completed,
                     FlagId = completedFlag.CompletedFlag.Id,
+                    TeamName = completedFlag.Team.Name,
                     Points = completedFlag.CompletedFlag.Points,
                     TeamId = completedFlag.Team.Id
                 });

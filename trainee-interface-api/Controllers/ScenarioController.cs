@@ -82,9 +82,10 @@ namespace trainee_interface_api.Controllers
             var leaderboard = new List<LeaderboardEntry>();
             foreach (var completedFlag in await _dbContext.FlagsCompleted.Include(x => x.CompletedFlag).Include(x => x.Team).Where(x => x.CompletedFlag.ScenarioId == scenarioId).ToListAsync())
             {
+                var startScenario = await _dbContext.StartedScenarios.Where(x => x.Team.Id == completedFlag.Team.Id && x.Scenario.Id == completedFlag.CompletedFlag.ScenarioId).FirstOrDefaultAsync();
                 leaderboard.Add(new LeaderboardEntry()
                 {
-                    CompleteDate = completedFlag.Completed,
+                    TotalSeconds = (completedFlag.Completed - startScenario.StartTime).TotalSeconds,
                     FlagId = completedFlag.CompletedFlag.Id,
                     TeamName = completedFlag.Team.Name,
                     Points = completedFlag.CompletedFlag.Points,

@@ -96,6 +96,28 @@ namespace trainee_interface_api.Controllers
             return Ok(new ApiResponse<List<LeaderboardEntry>>(true, leaderboard));
         }
 
+        [HttpGet("current/{teamId}")]
+        public async Task<IActionResult> GetCurrentScenario(int teamId)
+        {
+            if(teamId < 1)
+            {
+                return BadRequest(new ApiResponse<string>(false, "teamId incorrect"));
+            }
+
+            if(await _dbContext.Teams.AnyAsync(x => x.Id == teamId))
+            {
+                return BadRequest(new ApiResponse<string>(false, "teamId doesnt exist"));
+            }
+
+            var currentScenario = await _dbContext.StartedScenarios.Include(x => x.Scenario).FirstOrDefaultAsync(x => x.Team.Id == teamId && x.EndTime == null);
+            if(currentScenario == default)
+            {
+                return BadRequest(new ApiResponse<string>(false, "Team has no scenario that is in progress"));
+            }
+
+            return Ok(new ApiResponse<Scenario>(true,  currentScenario.Scenario));
+        }
+
         [HttpPost]
         public async Task<IActionResult> ToggleScenario(ToggleScenario toggleScenario)
         {

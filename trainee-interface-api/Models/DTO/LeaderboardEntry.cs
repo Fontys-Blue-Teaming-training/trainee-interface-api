@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace trainee_interface_api.Models.DTO
+﻿namespace trainee_interface_api.Models.DTO
 {
     public class LeaderboardEntry
     {

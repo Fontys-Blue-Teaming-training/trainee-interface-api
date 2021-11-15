@@ -115,7 +115,7 @@ namespace trainee_interface_api.Controllers
                 return BadRequest(new ApiResponse<string>(false, "Team has no scenario that is in progress"));
             }
 
-            return Ok(new ApiResponse<Scenario>(true,  currentScenario.Scenario));
+            return Ok(new ApiResponse<StartedScenario>(true,  currentScenario));
         }
 
         [HttpPost]

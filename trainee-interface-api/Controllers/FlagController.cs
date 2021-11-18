@@ -90,5 +90,39 @@ namespace trainee_interface_api.Controllers
             }
             return Ok(new ApiResponse<List<TeamFlagStatus>>(true, teamFlagStatus));
         }
+
+        [HttpGet("team/{teamId}")]
+        public async Task<IActionResult> GetCompletedFlagsByTeamId(int teamId)
+        {
+            if(teamId < 1)
+            {
+                return BadRequest(new ApiResponse<string>(false, "TeamId cannot be lower than 1!"));
+            }
+
+            var team = await _dbContext.Teams.FirstOrDefaultAsync(x => x.Id == teamId);
+            if(team == default)
+            {
+                return BadRequest(new ApiResponse<string>(false, "Team does not exist!"));
+            }
+
+            var startedScenario = await _dbContext.StartedScenarios.Include(x => x.Team).FirstOrDefaultAsync(x => x.Team.Id == teamId && x.EndTime == null);
+            if(startedScenario == default)
+            {
+                return BadRequest(new ApiResponse<string>(false, "Team does not have a started scenario!"));
+            }
+
+            var teamFlagStatus = new List<TeamFlagStatus>();
+            foreach (var flag in await _dbContext.Flags.Where(x => x.ScenarioId == startedScenario.Id).ToListAsync())
+            {
+                var strippedFlag = new TeamFlagStatus() { Flag = flag, IsCompleted = await _dbContext.FlagsCompleted.AnyAsync(x => x.Team.Id == team.Id && x.CompletedFlag.Id == flag.Id) };
+                if (!strippedFlag.IsCompleted)
+                {
+                    strippedFlag.Flag.FlagCode = "";
+                }
+
+                teamFlagStatus.Add(strippedFlag);
+            }
+            return Ok(new ApiResponse<List<TeamFlagStatus>>(true, teamFlagStatus));
+        }
     }
 }

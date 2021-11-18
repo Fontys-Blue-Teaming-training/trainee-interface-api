@@ -138,6 +138,11 @@ namespace trainee_interface_api.Controllers
                 return BadRequest(new ApiResponse<string>(false, "ScenarioId does not exist"));
             }
 
+            if (await _dbContext.StartedScenarios.Include(x => x.Scenario).AnyAsync(x => x.Scenario.Id != toggleScenario.ScenarioId && x.EndTime == null))
+            {
+                return BadRequest(new ApiResponse<string>(false, "Team already has a started scenario!"));
+            }
+
             var startedScenario = await _dbContext.StartedScenarios.Where(x => x.Team.Id == toggleScenario.TeamId && x.Scenario.Id == toggleScenario.ScenarioId).FirstOrDefaultAsync();
             if(startedScenario != default)
             {

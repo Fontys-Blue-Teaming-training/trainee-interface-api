@@ -105,14 +105,14 @@ namespace trainee_interface_api.Controllers
                 return BadRequest(new ApiResponse<string>(false, "Team does not exist!"));
             }
 
-            var startedScenario = await _dbContext.StartedScenarios.Include(x => x.Team).FirstOrDefaultAsync(x => x.Team.Id == teamId && x.EndTime == null);
+            var startedScenario = await _dbContext.StartedScenarios.Include(x => x.Team).Include(x => x.Scenario).FirstOrDefaultAsync(x => x.Team.Id == teamId && x.EndTime == null);
             if(startedScenario == default)
             {
                 return BadRequest(new ApiResponse<string>(false, "Team does not have a started scenario!"));
             }
 
             var teamFlagStatus = new List<TeamFlagStatus>();
-            foreach (var flag in await _dbContext.Flags.Where(x => x.ScenarioId == startedScenario.Id).ToListAsync())
+            foreach (var flag in await _dbContext.Flags.Include(x => x.Scenario).Where(x => x.ScenarioId == startedScenario.Scenario.Id).ToListAsync())
             {
                 var strippedFlag = new TeamFlagStatus() { Flag = flag, IsCompleted = await _dbContext.FlagsCompleted.AnyAsync(x => x.Team.Id == team.Id && x.CompletedFlag.Id == flag.Id) };
                 if (!strippedFlag.IsCompleted)

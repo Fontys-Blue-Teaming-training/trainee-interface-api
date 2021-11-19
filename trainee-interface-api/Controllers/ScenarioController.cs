@@ -104,7 +104,7 @@ namespace trainee_interface_api.Controllers
                 return BadRequest(new ApiResponse<string>(false, "teamId incorrect"));
             }
 
-            if(await _dbContext.Teams.AnyAsync(x => x.Id == teamId))
+            if(!await _dbContext.Teams.AnyAsync(x => x.Id == teamId))
             {
                 return BadRequest(new ApiResponse<string>(false, "teamId doesnt exist"));
             }

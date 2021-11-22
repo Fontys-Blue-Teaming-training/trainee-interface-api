@@ -14,6 +14,7 @@ namespace trainee_interface_api
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    webBuilder.UseUrls("http://0.0.0.0:5000");
                     webBuilder.UseStartup<Startup>();
                 });
     }

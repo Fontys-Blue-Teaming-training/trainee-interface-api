@@ -16,7 +16,7 @@ namespace trainee_interface_api.Contexts
         // Change this
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            var connectionString = "server=localhost;user=root;password=redteamingdatabase;database=redteamingdb";
+            var connectionString = "server=localhost;user=root;password=root;database=redteamingdb";
             optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
             optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
             optionsBuilder.EnableSensitiveDataLogging();

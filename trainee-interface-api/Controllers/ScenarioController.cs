@@ -61,7 +61,7 @@ namespace trainee_interface_api.Controllers
                 }
             }
 
-            highscore = highscore.OrderBy(x => x.Points).ToList();
+            highscore = highscore.OrderByDescending(x => x.Points).ToList();
 
             return Ok(new ApiResponse<List<HighscoreEntry>>(true, highscore));
         }

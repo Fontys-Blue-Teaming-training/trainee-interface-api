@@ -84,6 +84,7 @@ namespace trainee_interface_api.Controllers
                 if(!strippedFlag.IsCompleted)
                 {
                     strippedFlag.Flag.FlagCode = "";
+                    strippedFlag.Flag.Description = "Flag not found yet!";
                 }
 
                 teamFlagStatus.Add(strippedFlag);
@@ -118,6 +119,7 @@ namespace trainee_interface_api.Controllers
                 if (!strippedFlag.IsCompleted)
                 {
                     strippedFlag.Flag.FlagCode = "";
+                    strippedFlag.Flag.Description = "Flag not found yet!";
                 }
 
                 teamFlagStatus.Add(strippedFlag);

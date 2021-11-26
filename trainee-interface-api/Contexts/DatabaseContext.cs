@@ -12,6 +12,7 @@ namespace trainee_interface_api.Contexts
         public DbSet<Scenario> Scenarios { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<StartedScenario> StartedScenarios { get; set; }
+        public DbSet<Hint> Hints { get; set; }
 
         // Change this
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

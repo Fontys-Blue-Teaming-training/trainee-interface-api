@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿    using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using trainee_interface_api.Models.DTO;
 
 namespace trainee_interface_api.Controllers
 {
-    [Route("[controller]")]
+    [Route("[controller]")] 
     [ApiController]
     public class ScenarioController : ControllerBase
     {

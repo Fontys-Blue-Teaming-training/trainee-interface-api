@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using System.Linq;
 using trainee_interface_api.Contexts;
-using System.Collections.Generic;
 using trainee_interface_api.Models.DTO;
 
 namespace trainee_interface_api.Controllers
@@ -28,6 +27,12 @@ namespace trainee_interface_api.Controllers
             var hint = await _dbContext.Hints.Where(x => x.HintId == hintId).FirstOrDefaultAsync();
             DisplayHint displayHint = new DisplayHint(hint.HintText, hint.ImageUrl);
             return Ok(new ApiResponse<DisplayHint>(true, displayHint));
+        }
+
+        [HttpGet("/{ScenarioId}/{HintId}")]
+        public async Task<IActionResult> GetHintByScenarioAndHintId(int scenarioId, int hintId)
+        {
+            var hint = await _dbContext.Hints.Where(x => x.HintId == hintId, x => x.ScenarioId == scenarioId).FirstOrDefaultAsync();
         }
 
     }

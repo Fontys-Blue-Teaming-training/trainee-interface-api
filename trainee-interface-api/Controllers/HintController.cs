@@ -32,7 +32,9 @@ namespace trainee_interface_api.Controllers
         [HttpGet("/{ScenarioId}/{HintId}")]
         public async Task<IActionResult> GetHintByScenarioAndHintId(int scenarioId, int hintId)
         {
-            var hint = await _dbContext.Hints.Where(x => x.HintId == hintId, x => x.ScenarioId == scenarioId).FirstOrDefaultAsync();
+            var hint = await _dbContext.Hints.Where(x => x.HintId == hintId && x.ScenarioId == scenarioId).FirstOrDefaultAsync();
+            DisplayHint displayHint = new DisplayHint(hint.HintText, hint.ImageUrl);
+            return Ok(new ApiResponse<DisplayHint>(true, displayHint));
         }
 
     }

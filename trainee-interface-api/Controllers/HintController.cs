@@ -7,6 +7,7 @@ using trainee_interface_api.Contexts;
 using trainee_interface_api.Models.DTO;
 using trainee_interface_api.Models;
 using System;
+using System.Collections.Generic;
 
 namespace trainee_interface_api.Controllers
 {
@@ -47,40 +48,64 @@ namespace trainee_interface_api.Controllers
             return Ok(new ApiResponse<DisplayHint>(true, displayHint));
         }
 
-        [HttpGet("getnexthint/{teamId}")]
-        public async Task<IActionResult> GetNextHint(int teamId)
+        [HttpGet("getflaghint/{teamId}/{flagId}")]
+        public async Task<IActionResult> GetFlagHint(int teamId, int flagId)
         {
-            if (teamId == 0)
+            if (teamId == 0 || !await _dbContext.Teams.AnyAsync(x => x.Id == teamId))
             {
                 return BadRequest(new ApiResponse<string>(false, "No team exists with that Id"));
             }
 
             var currentScenario = await _dbContext.StartedScenarios.Include(x => x.Scenario).FirstOrDefaultAsync(x => x.Team.Id == teamId && x.EndTime == null);
-            var teamHint = await _dbContext.TeamHints.Where(x => x.TeamId == currentScenario.Id).FirstOrDefaultAsync();
-
-            if(teamHint == null)
-            {
-                TeamHint tHint = new TeamHint(1, currentScenario.Id);
-                await _dbContext.TeamHints.AddAsync(tHint);
-            }
             var team = await _dbContext.Teams.Where(x => x.Id == teamId).FirstOrDefaultAsync();
-            var hint = await _dbContext.Hints.Where(x => x.HintId == teamHint.HintId).FirstOrDefaultAsync();
+            var hint = await _dbContext.Hints.Where(x => x.FlagId == flagId).FirstOrDefaultAsync();
 
             if (hint != null)
             {
-                teamHint.HintId = teamHint.HintId + 1;
-                HintLog hintLog = new HintLog(team.Name, hint.HintId, hint.ScenarioId);
+                HintLog hintLog = new HintLog(team.Id, hint.HintId, hint.ScenarioId);
                 await _dbContext.HintLogs.AddAsync(hintLog);
             }
 
             if (hint == null)
             {
-                return BadRequest(new ApiResponse<string>(false, "There is no remaining hints for this scenario left"));
+                return BadRequest(new ApiResponse<string>(false, "There is no hint that corresponds with the given flag"));
             }
-
             await _dbContext.SaveChangesAsync();
             DisplayHint displayHint = new DisplayHint(hint.HintText, hint.ImageUrl);
             return Ok(new ApiResponse<DisplayHint>(true, displayHint));
+        }
+        [HttpGet("getpenalty/{teamId}/{scenarioId}")]
+        public async Task<IActionResult> GetTimePenalty(int teamId, int scenarioId)
+        {
+            if (scenarioId == 0 || !await _dbContext.Scenarios.AnyAsync(x => x.Id == scenarioId))
+            {
+                return BadRequest(new ApiResponse<string>(false, "This scenario does not exist"));
+            }
+
+            List<int> PenaltyList = new List<int>();
+
+            if (teamId == 0 || !await _dbContext.Teams.AnyAsync(x => x.Id == teamId))
+            {
+                return BadRequest(new ApiResponse<string>(false, "No team exists with that Id"));
+            }
+
+            var hintsUsed = (await _dbContext.HintLogs.Include(x => x.Hint).Where(x => x.TeamId == teamId).Select(u => u.Hint).ToListAsync());
+
+            foreach (var z in hintsUsed)
+            {
+                var TimePenalty = await _dbContext.Hints.Where(x => x.HintId == z.HintId && scenarioId == x.ScenarioId).Select(u => u.TimePenalty).ToListAsync();
+                PenaltyList.AddRange(TimePenalty);
+            }
+
+            if ((PenaltyList != null) && (!PenaltyList.Any()))
+            {
+                return Ok(new ApiResponse<int>(true, 0));
+            }
+            else
+            {
+                int TimePenalty = PenaltyList.Sum(x => Convert.ToInt32(x));
+                return Ok(new ApiResponse<int>(true, TimePenalty));
+            }
         }
     }
 }

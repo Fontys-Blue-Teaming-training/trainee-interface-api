@@ -9,8 +9,12 @@ namespace trainee_interface_api.Models
         [Required]
         public int ScenarioId { get; set; }
         [Required]
+        public int FlagId { get; set; }
+        [Required]
         public string HintText { get; set; }
         [Required]
         public string ImageUrl { get; set; }
+        [Required]
+        public int TimePenalty { get; set; }
     }
 }

@@ -13,7 +13,6 @@ namespace trainee_interface_api.Contexts
         public DbSet<Team> Teams { get; set; }
         public DbSet<StartedScenario> StartedScenarios { get; set; }
         public DbSet<Hint> Hints { get; set; }
-        public DbSet<TeamHint> TeamHints { get; set; }
         public DbSet<HintLog> HintLogs { get; set; }
 
         // Change this

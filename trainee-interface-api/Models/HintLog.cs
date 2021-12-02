@@ -9,7 +9,7 @@ namespace trainee_interface_api.Models
         [Required]
         public int Id { get; set; }
         [Required]
-        public string TeamName { get; set; }
+        public int TeamId { get; set; }
         [Required]
         public int HintId { get; set; }
         [Required]
@@ -17,9 +17,11 @@ namespace trainee_interface_api.Models
         [Required, DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime RecievedTime { get; set; }
 
-        public HintLog(string teamName, int hintId, int scenarioId)
+        public Hint Hint { get; set; }
+
+        public HintLog(int teamId, int hintId, int scenarioId)
         {
-            TeamName = teamName;
+            TeamId = teamId;
             HintId = hintId;
             ScenarioId = scenarioId;
         }

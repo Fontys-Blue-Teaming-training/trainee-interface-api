@@ -60,13 +60,13 @@ namespace trainee_interface_api.Controllers
             var team = await _dbContext.Teams.Where(x => x.Id == teamId).FirstOrDefaultAsync();
             var hint = await _dbContext.Hints.Where(x => x.FlagId == flagId).FirstOrDefaultAsync();
 
-            if (hint != null)
+            if (hint != default)
             {
                 HintLog hintLog = new HintLog(team.Id, hint.HintId, hint.ScenarioId);
                 await _dbContext.HintLogs.AddAsync(hintLog);
             }
 
-            if (hint == null)
+            if (hint == default)
             {
                 return BadRequest(new ApiResponse<string>(false, "There is no hint that corresponds with the given flag"));
             }

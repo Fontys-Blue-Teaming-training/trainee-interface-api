@@ -12,5 +12,11 @@ namespace trainee_interface_api.Models
         public int HintId { get; set; }
         [Required]
         public int TeamId { get; set; }
+
+        public TeamHint(int hintId, int teamId)
+        {
+            HintId = hintId;
+            TeamId = teamId;
+        }
     }
 }

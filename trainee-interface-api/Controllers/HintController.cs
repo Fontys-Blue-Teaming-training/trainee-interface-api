@@ -52,29 +52,35 @@ namespace trainee_interface_api.Controllers
         {
             if (teamId == 0)
             {
-                return BadRequest(new ApiResponse<string>(false, "no team found"));
+                return BadRequest(new ApiResponse<string>(false, "No team exists with that Id"));
             }
+
             var currentScenario = await _dbContext.StartedScenarios.Include(x => x.Scenario).FirstOrDefaultAsync(x => x.Team.Id == teamId && x.EndTime == null);
             var teamHint = await _dbContext.TeamHints.Where(x => x.TeamId == currentScenario.Id).FirstOrDefaultAsync();
+
+            if(teamHint == null)
+            {
+                TeamHint tHint = new TeamHint(1, currentScenario.Id);
+                await _dbContext.TeamHints.AddAsync(tHint);
+            }
             var team = await _dbContext.Teams.Where(x => x.Id == teamId).FirstOrDefaultAsync();
             var hint = await _dbContext.Hints.Where(x => x.HintId == teamHint.HintId).FirstOrDefaultAsync();
+
             if (hint != null)
             {
                 teamHint.HintId = teamHint.HintId + 1;
-                await _dbContext.SaveChangesAsync();
+                HintLog hintLog = new HintLog(team.Name, hint.HintId, hint.ScenarioId);
+                await _dbContext.HintLogs.AddAsync(hintLog);
             }
-            HintLog hintLog = new HintLog(team.Name, hint.HintId, hint.ScenarioId);
-            await _dbContext.HintLogs.AddAsync(hintLog);
-            await _dbContext.SaveChangesAsync();
 
             if (hint == null)
             {
                 return BadRequest(new ApiResponse<string>(false, "There is no remaining hints for this scenario left"));
             }
 
+            await _dbContext.SaveChangesAsync();
             DisplayHint displayHint = new DisplayHint(hint.HintText, hint.ImageUrl);
             return Ok(new ApiResponse<DisplayHint>(true, displayHint));
-
         }
     }
 }

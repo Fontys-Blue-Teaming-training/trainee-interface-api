@@ -53,7 +53,7 @@ namespace trainee_interface_api.Contexts
 
             modelBuilder.Entity<Hint>()
                 .HasData(
-                new Hint() { HintId = 1, ScenarioId = 1, HintText = "Dit is de eerste hint", ImageUrl = "https://media.s-bol.com/B1RRrGVXBJlJ/P1ovkE4/550x649.jpg" }
+                new Hint() { HintId = 1, ScenarioId = 1, HintText = "Dit is de eerste hint", ImageUrl = "https://media.s-bol.com/B1RRrGVXBJlJ/P1ovkE4/550x649.jpg", FlagId = 1, TimePenalty = 100}
                 );
         }
     }

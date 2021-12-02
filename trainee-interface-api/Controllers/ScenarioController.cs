@@ -126,10 +126,13 @@ namespace trainee_interface_api.Controllers
                 return BadRequest(new ApiResponse<string>(false, "ToggleScenario cannot be empty"));
             }
 
-            var team = await _dbContext.Teams.FirstOrDefaultAsync(x => x.Id == toggleScenario.TeamId);
-            if (team == default)
+            foreach (var teamId in toggleScenario.TeamIds)
             {
-                return BadRequest(new ApiResponse<string>(false, "TeamId does not exist"));
+                var team = await _dbContext.Teams.FirstOrDefaultAsync(x => x.Id == teamId);
+                if (team == default)
+                {
+                    return BadRequest(new ApiResponse<string>(false, $"TeamId {teamId} does not exist"));
+                }
             }
 
             var scenario = await _dbContext.Scenarios.FirstOrDefaultAsync(x => x.Id == toggleScenario.ScenarioId);
@@ -138,34 +141,57 @@ namespace trainee_interface_api.Controllers
                 return BadRequest(new ApiResponse<string>(false, "ScenarioId does not exist"));
             }
 
-            if (await _dbContext.StartedScenarios.Include(x => x.Team).AnyAsync(x => x.Team.Id == toggleScenario.TeamId && x.Scenario.Id != toggleScenario.ScenarioId && x.EndTime == null))
+            int hasStarted = 0;
+            foreach (var teamId in toggleScenario.TeamIds)
             {
-                return BadRequest(new ApiResponse<string>(false, "Team already has a started scenario!"));
-            }
-
-            var startedScenario = await _dbContext.StartedScenarios.Where(x => x.Team.Id == toggleScenario.TeamId && x.Scenario.Id == toggleScenario.ScenarioId).FirstOrDefaultAsync();
-            if(startedScenario != default)
-            {
-                if(startedScenario.EndTime != null)
+                if (await _dbContext.StartedScenarios.Include(x => x.Team).AnyAsync(x => x.Team.Id == teamId && x.Scenario.Id != toggleScenario.ScenarioId && x.EndTime == null))
                 {
-                    return BadRequest(new ApiResponse<string>(false, "Team already completed this scenario!"));
+                    return BadRequest(new ApiResponse<string>(false, "Team already has a started scenario!"));
                 }
 
-                startedScenario.EndTime = DateTime.Now;
+                var startedScenario = await _dbContext.StartedScenarios.Where(x => x.Team.Id == teamId && x.Scenario.Id == toggleScenario.ScenarioId).FirstOrDefaultAsync();
+                if(startedScenario != default)
+                {
+                    if (startedScenario.EndTime != null)
+                    {
+                        return BadRequest(new ApiResponse<string>(false, $"Team {teamId} already completed this scenario!"));
+                    }
+
+                    hasStarted++;
+                }
+            }
+
+            if(hasStarted > 0 && hasStarted != toggleScenario.TeamIds.Length)
+            {
+                return BadRequest(new ApiResponse<string>(false, $"Some (but not all) teams have already started this scenario!"));
+            }
+
+            List<StartedScenario> startedScenarios = new List<StartedScenario>();
+
+            if(hasStarted > 0 && hasStarted == toggleScenario.TeamIds.Length)
+            {
+                foreach (var teamId in toggleScenario.TeamIds)
+                {
+                    var startedScenario = await _dbContext.StartedScenarios.Where(x => x.Team.Id == teamId && x.Scenario.Id == toggleScenario.ScenarioId).FirstOrDefaultAsync();
+                    startedScenario.EndTime = DateTime.Now;
+                }
             }
             else
             {
-                startedScenario = new StartedScenario()
+                foreach (var teamId in toggleScenario.TeamIds)
                 {
-                    Team = team,
-                    Scenario = scenario
-                };
-
-                await _dbContext.StartedScenarios.AddAsync(startedScenario);
+                    var startedScenario = new StartedScenario()
+                    {
+                        Team = await _dbContext.Teams.FirstOrDefaultAsync(x => x.Id == teamId),
+                        Scenario = scenario
+                    };
+                    await _dbContext.StartedScenarios.AddAsync(startedScenario);
+                    startedScenarios.Add(startedScenario);
+                }
             }
 
             await _dbContext.SaveChangesAsync();
-            return Ok(new ApiResponse<StartedScenario>(true, startedScenario));
+            return Ok(new ApiResponse<List<StartedScenario>>(true, startedScenarios));
         }
     }
 }

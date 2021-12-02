@@ -126,15 +126,6 @@ namespace trainee_interface_api.Controllers
                 return BadRequest(new ApiResponse<string>(false, "ToggleScenario cannot be empty"));
             }
 
-            foreach (var teamId in toggleScenario.TeamIds)
-            {
-                var team = await _dbContext.Teams.FirstOrDefaultAsync(x => x.Id == teamId);
-                if (team == default)
-                {
-                    return BadRequest(new ApiResponse<string>(false, $"TeamId {teamId} does not exist"));
-                }
-            }
-
             var scenario = await _dbContext.Scenarios.FirstOrDefaultAsync(x => x.Id == toggleScenario.ScenarioId);
             if (scenario == default)
             {
@@ -144,13 +135,19 @@ namespace trainee_interface_api.Controllers
             int hasStarted = 0;
             foreach (var teamId in toggleScenario.TeamIds)
             {
+                var team = await _dbContext.Teams.FirstOrDefaultAsync(x => x.Id == teamId);
+                if (team == default)
+                {
+                    return BadRequest(new ApiResponse<string>(false, $"TeamId {teamId} does not exist"));
+                }
+
                 if (await _dbContext.StartedScenarios.Include(x => x.Team).AnyAsync(x => x.Team.Id == teamId && x.Scenario.Id != toggleScenario.ScenarioId && x.EndTime == null))
                 {
                     return BadRequest(new ApiResponse<string>(false, "Team already has a started scenario!"));
                 }
 
                 var startedScenario = await _dbContext.StartedScenarios.Where(x => x.Team.Id == teamId && x.Scenario.Id == toggleScenario.ScenarioId).FirstOrDefaultAsync();
-                if(startedScenario != default)
+                if (startedScenario != default)
                 {
                     if (startedScenario.EndTime != null)
                     {
@@ -174,6 +171,7 @@ namespace trainee_interface_api.Controllers
                 {
                     var startedScenario = await _dbContext.StartedScenarios.Where(x => x.Team.Id == teamId && x.Scenario.Id == toggleScenario.ScenarioId).FirstOrDefaultAsync();
                     startedScenario.EndTime = DateTime.Now;
+                    _dbContext.StartedScenarios.Update(startedScenario);
                 }
             }
             else

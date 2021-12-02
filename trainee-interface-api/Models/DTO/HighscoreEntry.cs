@@ -3,7 +3,7 @@
     public class HighscoreEntry
     {
         public string TeamName { get; set; }
-        public int Points { get; set; }
+        public double TotalSeconds { get; set; }
         public int AmountOfFlags { get; set; }
     }
 }

@@ -20,17 +20,6 @@ namespace trainee_interface_api.Controllers
             _dbContext = dbContext;
         }
 
-        [HttpGet("{scenarioId}")]
-        public async Task<IActionResult> GetFlagsByScenarioId(int scenarioId)
-        {
-            var flags = await _dbContext.Flags.Include(x => x.Scenario).Where(x => x.ScenarioId == scenarioId).ToListAsync();
-            foreach (var flag in flags)
-            {
-                flag.FlagCode = "";
-            }
-            return Ok(new ApiResponse<List<Flag>>(true, flags));
-        }
-
         [HttpPost]
         public async Task<IActionResult> CompleteFlag(CompleteFlag completeFlag)
         {

@@ -26,28 +26,6 @@ namespace trainee_interface_api.Controllers
             return Ok(new ApiResponse<List<Team>>(true, await _dbContext.Teams.ToListAsync()));
         }
 
-        [HttpGet("results")]
-        public async Task<IActionResult> GetTeamResults()
-        {
-            var results = await _dbContext.FlagsCompleted.ToListAsync();
-            foreach (var result in results)
-            {
-                result.CompletedFlag.FlagCode = "";
-            }
-            return Ok(new ApiResponse<List<FlagCompleted>>(true, results));
-        }
-
-        [HttpGet("results/{teamId}")]
-        public async Task<IActionResult> GetTeamResultsByTeamId(int teamId)
-        {
-            var results = await _dbContext.FlagsCompleted.Where(x => x.Team.Id == teamId).ToListAsync();
-            foreach (var result in results)
-            {
-                result.CompletedFlag.FlagCode = "";
-            }
-            return Ok(new ApiResponse<List<FlagCompleted>>(true, results));
-        }
-
         [HttpPost]
         public async Task<IActionResult> CreateTeam(Team team)
         {

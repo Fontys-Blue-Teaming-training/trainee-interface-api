@@ -12,11 +12,13 @@ namespace trainee_interface_api.Contexts
         public DbSet<Scenario> Scenarios { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<StartedScenario> StartedScenarios { get; set; }
+        public DbSet<Hint> Hints { get; set; }
+        public DbSet<HintLog> HintLogs { get; set; }
 
         // Change this
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            var connectionString = "server=localhost;user=root;password=root;database=redteamingdb";
+            var connectionString = "server=localhost;user=root;password=redteamingdatabase;database=redteamingdb";
             optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
             optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
             optionsBuilder.EnableSensitiveDataLogging();
@@ -47,6 +49,11 @@ namespace trainee_interface_api.Contexts
                     new Flag() { Id = 5, Description = "Copyright of BBQ image", Points = 1000, FlagCode = "BT_FORENSICS{Nucl3ar_C0d3}", ScenarioId = 2 },
                     new Flag() { Id = 6, Description = "Flag inside the journal", Points = 1000, FlagCode = "BT_FORENSICS{J0urNal_Fr3nch}", ScenarioId = 2 },
                     new Flag() { Id = 7, Description = "Flag inside mail to Gerda", Points = 1000, FlagCode = "BT_FORENSICS{3Mai1_G3rdA}", ScenarioId = 2 }
+                );
+
+            modelBuilder.Entity<Hint>()
+                .HasData(
+                new Hint() { HintId = 1, ScenarioId = 1, HintText = "Dit is de eerste hint", ImageUrl = "https://media.s-bol.com/B1RRrGVXBJlJ/P1ovkE4/550x649.jpg", FlagId = 1, TimePenalty = 100}
                 );
         }
     }

@@ -12,7 +12,7 @@ namespace trainee_interface_api.Models
         public Team Team { get; set; }
         [Required]
         public Scenario Scenario{ get; set; }
-        [Required, DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        [Required, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime StartTime { get; set; }
         public DateTime? EndTime { get; set; }
     }

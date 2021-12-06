@@ -36,7 +36,8 @@ namespace trainee_interface_api.Contexts
             modelBuilder.Entity<Scenario>()
                 .HasData(
                     new Scenario() { Id = 1, Name = "SSH Bruteforce" },
-                    new Scenario() { Id = 2, Name = "Forensics" }
+                    new Scenario() { Id = 2, Name = "Forensics" },
+                    new Scenario() { Id = 3, Name = "Malware" }
                 );
 
             modelBuilder.Entity<Flag>()

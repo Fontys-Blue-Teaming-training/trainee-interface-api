@@ -160,8 +160,20 @@ namespace trainee_interface_api.Controllers
             {
                 foreach (var teamId in toggleScenario.TeamIds)
                 {
+                    List<int> PenaltyList = new List<int>();
+                    var hintsUsed = (await _dbContext.HintLogs.Include(x => x.Hint).Where(x => x.TeamId == teamId).Select(u => u.Hint).ToListAsync());
+
+                    foreach (var z in hintsUsed)
+                    {
+                        var TimePenalty = await _dbContext.Hints.Where(x => x.HintId == z.HintId && toggleScenario.ScenarioId == x.ScenarioId).Select(u => u.TimePenalty).ToListAsync();
+                        PenaltyList.AddRange(TimePenalty);
+                    }
+
+                    int AddedTimePenalty = PenaltyList.Sum(x => Convert.ToInt32(x));
+
                     var startedScenario = await _dbContext.StartedScenarios.Where(x => x.Team.Id == teamId && x.Scenario.Id == toggleScenario.ScenarioId).FirstOrDefaultAsync();
-                    startedScenario.EndTime = DateTime.Now;
+
+                    startedScenario.EndTime = DateTime.Now.AddSeconds(AddedTimePenalty);
                     await _dbContext.SaveChangesAsync();
                     startedScenarios.Add(startedScenario);
                 }

@@ -63,7 +63,11 @@ namespace trainee_interface_api.Controllers
             if (hint != default)
             {
                 HintLog hintLog = new HintLog(team.Id, hint.HintId, hint.ScenarioId);
-                await _dbContext.HintLogs.AddAsync(hintLog);
+                var HintLogMaybe = await _dbContext.HintLogs.Where(x => x.ScenarioId == hint.ScenarioId && x.HintId == hint.HintId && x.TeamId == team.Id).FirstOrDefaultAsync();
+                if (HintLogMaybe != default)
+                    {
+                    await _dbContext.HintLogs.AddAsync(hintLog);
+                }
             }
 
             if (hint == default)

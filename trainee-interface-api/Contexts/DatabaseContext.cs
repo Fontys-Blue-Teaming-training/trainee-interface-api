@@ -54,8 +54,16 @@ namespace trainee_interface_api.Contexts
 
             modelBuilder.Entity<Hint>()
                 .HasData(
-                new Hint() { HintId = 1, ScenarioId = 1, HintText = "Dit is de eerste hint", ImageUrl = "https://media.s-bol.com/B1RRrGVXBJlJ/P1ovkE4/550x649.jpg", FlagId = 1, TimePenalty = 100}
+                new Hint() { HintId = 1, ScenarioId = 1, HintText = "Scout around in the Firewall Rule Section, try to look for the flag in one of the rules", FlagId = 1, TimePenalty = 100 },
+                new Hint() { HintId = 2, ScenarioId = 1, HintText = "Try to find the search query used during the traffic spoofing", FlagId = 2, TimePenalty = 100 },
+                new Hint() { HintId = 3, ScenarioId = 1, HintText = "Use the SOC to find alerts for more information", FlagId = 3, TimePenalty = 100 },
+                new Hint() { HintId = 4, ScenarioId = 1, HintText = "Find out who has been bruteforcing the system, maybe his username hides a clue", FlagId = 4, TimePenalty = 100 },
+
+                new Hint() { HintId = 5, ScenarioId = 2, HintText = "Maybe the image that the actor has found, contains secret data", FlagId = 5, TimePenalty = 100 },
+                new Hint() { HintId = 6, ScenarioId = 2, HintText = "Let's find out if the actors journal hides something we haven't looked at yet!", FlagId = 6, TimePenalty = 100 },
+                new Hint() { HintId = 7, ScenarioId = 2, HintText = "Hmm, let's look at the email account and find out if anything secret is hiding there", FlagId = 7, TimePenalty = 100 }
                 );
+
         }
     }
 }

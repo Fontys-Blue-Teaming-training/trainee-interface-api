@@ -12,7 +12,6 @@ namespace trainee_interface_api.Models
         public int FlagId { get; set; }
         [Required]
         public string HintText { get; set; }
-        [Required]
         public string ImageUrl { get; set; }
         [Required]
         public int TimePenalty { get; set; }

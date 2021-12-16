@@ -69,7 +69,6 @@ namespace trainee_interface_api.Contexts
                 new Hint() { HintId = 9, ScenarioId = 3, HintText = "The Hive System should contain any clues for us to find", FlagId= 9, TimePenalty = 100 },
                 new Hint() { HintId = 10, ScenarioId = 3, HintText = "We should have eyes where the malware is located, let's try to figure out where to find the flag in there", FlagId = 10, TimePenalty = 100 }
                 );
-
         }
     }
 }

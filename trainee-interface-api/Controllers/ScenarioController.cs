@@ -42,17 +42,26 @@ namespace trainee_interface_api.Controllers
 
             var highscore = new List<HighscoreEntry>();
 
-            foreach (var completedScenario in await _dbContext.StartedScenarios.Include(x => x.Scenario).Include(x => x.Team).Where(x => x.Scenario.Id == scenarioId && x.EndTime != null).ToListAsync())
+            foreach (var completedFlag in await _dbContext.FlagsCompleted.Include(x => x.CompletedFlag).Include(x => x.Team).Where(x => x.CompletedFlag.ScenarioId == scenarioId).ToListAsync())
             {
-                highscore.Add(new HighscoreEntry()
+                var teamIndex = highscore.FindIndex(x => x.TeamName == completedFlag.Team.Name);
+                if (teamIndex < 0)
                 {
-                    TeamName = completedScenario.Team.Name,
-                    AmountOfFlags = (await _dbContext.FlagsCompleted.Include(x => x.Team).Include(x => x.CompletedFlag).Where(x => x.Team.Id == completedScenario.Team.Id && x.CompletedFlag.ScenarioId == scenarioId).ToListAsync()).Count,
-                    TotalSeconds = ((DateTime)completedScenario.EndTime - completedScenario.StartTime).TotalSeconds
-                });
+                    highscore.Add(new HighscoreEntry()
+                    {
+                        TeamName = completedFlag.Team.Name,
+                        Points = completedFlag.CompletedFlag.Points,
+                        AmountOfFlags = 1
+                    });
+                }
+                else
+                {
+                    highscore[teamIndex].AmountOfFlags++;
+                    highscore[teamIndex].Points += completedFlag.CompletedFlag.Points;
+                }
             }
 
-            highscore = highscore.OrderBy(x => x.TotalSeconds).ToList();
+            highscore = highscore.OrderByDescending(x => x.Points).ToList();
 
             return Ok(new ApiResponse<List<HighscoreEntry>>(true, highscore));
         }
@@ -117,71 +126,56 @@ namespace trainee_interface_api.Controllers
                 return BadRequest(new ApiResponse<string>(false, "ToggleScenario cannot be empty"));
             }
 
+            var team = await _dbContext.Teams.FirstOrDefaultAsync(x => x.Id == toggleScenario.TeamId);
+            if (team == default)
+            {
+                return BadRequest(new ApiResponse<string>(false, "TeamId does not exist"));
+            }
+
             var scenario = await _dbContext.Scenarios.FirstOrDefaultAsync(x => x.Id == toggleScenario.ScenarioId);
             if (scenario == default)
             {
                 return BadRequest(new ApiResponse<string>(false, "ScenarioId does not exist"));
             }
 
-            int hasStarted = 0;
-            foreach (var teamId in toggleScenario.TeamIds)
+            if (await _dbContext.StartedScenarios.Include(x => x.Team).AnyAsync(x => x.Team.Id == toggleScenario.TeamId && x.Scenario.Id != toggleScenario.ScenarioId && x.EndTime == null))
             {
-                var team = await _dbContext.Teams.FirstOrDefaultAsync(x => x.Id == teamId);
-                if (team == default)
-                {
-                    return BadRequest(new ApiResponse<string>(false, $"TeamId {teamId} does not exist"));
-                }
-
-                if (await _dbContext.StartedScenarios.Include(x => x.Team).AnyAsync(x => x.Team.Id == teamId && x.Scenario.Id != toggleScenario.ScenarioId && x.EndTime == null))
-                {
-                    return BadRequest(new ApiResponse<string>(false, "Team already has a started scenario!"));
-                }
-
-                var startedScenario = await _dbContext.StartedScenarios.Where(x => x.Team.Id == teamId && x.Scenario.Id == toggleScenario.ScenarioId).FirstOrDefaultAsync();
-                if (startedScenario != default)
-                {
-                    if (startedScenario.EndTime != null)
-                    {
-                        return BadRequest(new ApiResponse<string>(false, $"Team {teamId} already completed this scenario!"));
-                    }
-
-                    hasStarted++;
-                }
+                return BadRequest(new ApiResponse<string>(false, "Team already has a started scenario!"));
             }
 
-            if(hasStarted > 0 && hasStarted != toggleScenario.TeamIds.Length)
+            var startedScenario = await _dbContext.StartedScenarios.Where(x => x.Team.Id == toggleScenario.TeamId && x.Scenario.Id == toggleScenario.ScenarioId).FirstOrDefaultAsync();
+            if(startedScenario != default)
             {
-                return BadRequest(new ApiResponse<string>(false, $"Some (but not all) teams have already started this scenario!"));
-            }
-
-            List<StartedScenario> startedScenarios = new List<StartedScenario>();
-
-            if(hasStarted > 0 && hasStarted == toggleScenario.TeamIds.Length)
-            {
-                foreach (var teamId in toggleScenario.TeamIds)
+                if(startedScenario.EndTime != null)
                 {
-                    var startedScenario = await _dbContext.StartedScenarios.Where(x => x.Team.Id == teamId && x.Scenario.Id == toggleScenario.ScenarioId).FirstOrDefaultAsync();
-                    startedScenario.EndTime = DateTime.Now;
-                    await _dbContext.SaveChangesAsync();
-                    startedScenarios.Add(startedScenario);
+                    return BadRequest(new ApiResponse<string>(false, "Team already completed this scenario!"));
                 }
+
+                List<int> PenaltyList = new List<int>();
+                var hintsUsed = (await _dbContext.HintLogs.Include(x => x.Hint).Where(x => x.TeamId == toggleScenario.TeamId).Select(u => u.Hint).ToListAsync());
+
+                foreach (var z in hintsUsed)
+                {
+                    var xTimePenalty = await _dbContext.Hints.Where(x => x.HintId == z.HintId && toggleScenario.ScenarioId == x.ScenarioId).Select(u => u.TimePenalty).ToListAsync();
+                    PenaltyList.AddRange(xTimePenalty);
+                }
+
+                int TimePenalty = PenaltyList.Sum(x => Convert.ToInt32(x));
+                startedScenario.EndTime = DateTime.Now.AddSeconds(TimePenalty);
             }
             else
             {
-                foreach (var teamId in toggleScenario.TeamIds)
+                startedScenario = new StartedScenario()
                 {
-                    var startedScenario = new StartedScenario()
-                    {
-                        Team = await _dbContext.Teams.FirstOrDefaultAsync(x => x.Id == teamId),
-                        Scenario = scenario
-                    };
-                    await _dbContext.StartedScenarios.AddAsync(startedScenario);
-                    startedScenarios.Add(startedScenario);
-                }
+                    Team = team,
+                    Scenario = scenario
+                };
+
+                await _dbContext.StartedScenarios.AddAsync(startedScenario);
             }
 
             await _dbContext.SaveChangesAsync();
-            return Ok(new ApiResponse<List<StartedScenario>>(true, startedScenarios));
+            return Ok(new ApiResponse<StartedScenario>(true, startedScenario));
         }
     }
 }

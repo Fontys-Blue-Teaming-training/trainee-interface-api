@@ -151,7 +151,17 @@ namespace trainee_interface_api.Controllers
                     return BadRequest(new ApiResponse<string>(false, "Team already completed this scenario!"));
                 }
 
-                startedScenario.EndTime = DateTime.Now;
+                List<int> PenaltyList = new List<int>();
+                var hintsUsed = (await _dbContext.HintLogs.Include(x => x.Hint).Where(x => x.TeamId == toggleScenario.TeamId).Select(u => u.Hint).ToListAsync());
+
+                foreach (var z in hintsUsed)
+                {
+                    var xTimePenalty = await _dbContext.Hints.Where(x => x.HintId == z.HintId && toggleScenario.ScenarioId == x.ScenarioId).Select(u => u.TimePenalty).ToListAsync();
+                    PenaltyList.AddRange(xTimePenalty);
+                }
+
+                int TimePenalty = PenaltyList.Sum(x => Convert.ToInt32(x));
+                startedScenario.EndTime = DateTime.Now.AddSeconds(TimePenalty);
             }
             else
             {

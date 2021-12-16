@@ -14,8 +14,6 @@ namespace trainee_interface_api.Contexts
         public DbSet<StartedScenario> StartedScenarios { get; set; }
         public DbSet<Hint> Hints { get; set; }
         public DbSet<HintLog> HintLogs { get; set; }
-
-        // Change this
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var connectionString = "server=localhost;user=root;password=root;database=redteamingdb";
@@ -49,7 +47,11 @@ namespace trainee_interface_api.Contexts
 
                     new Flag() { Id = 5, Description = "Copyright of BBQ image", Points = 1000, FlagCode = "BT_FORENSICS{Nucl3ar_C0d3}", ScenarioId = 2 },
                     new Flag() { Id = 6, Description = "Flag inside the journal", Points = 1000, FlagCode = "BT_FORENSICS{J0urNal_Fr3nch}", ScenarioId = 2 },
-                    new Flag() { Id = 7, Description = "Flag inside mail to Gerda", Points = 1000, FlagCode = "BT_FORENSICS{3Mai1_G3rdA}", ScenarioId = 2 }
+                    new Flag() { Id = 7, Description = "Flag inside mail to Gerda", Points = 1000, FlagCode = "BT_FORENSICS{3Mai1_G3rdA}", ScenarioId = 2 },
+
+                    new Flag() { Id = 8, Description = "Flag inside the Suricata Alert", Points = 1000, FlagCode = "BT_MALWARE{Tw1TcH}", ScenarioId = 3 },
+                    new Flag() { Id = 9, Description = "Flag inside the Hive escalation", Points = 1000, FlagCode = "BT_MALWARE{H1VE}", ScenarioId = 3 },
+                    new Flag() { Id = 10, Description = "Flag inside the Folder of the Malware", Points = 1000, FlagCode = "BT_MALWARE{L0CaT10n}", ScenarioId = 3 }
                 );
 
             modelBuilder.Entity<Hint>()
@@ -61,7 +63,11 @@ namespace trainee_interface_api.Contexts
 
                 new Hint() { HintId = 5, ScenarioId = 2, HintText = "Maybe the image that the actor has found, contains secret data", FlagId = 5, TimePenalty = 100 },
                 new Hint() { HintId = 6, ScenarioId = 2, HintText = "Let's find out if the actors journal hides something we haven't looked at yet!", FlagId = 6, TimePenalty = 100 },
-                new Hint() { HintId = 7, ScenarioId = 2, HintText = "Hmm, let's look at the email account and find out if anything secret is hiding there", FlagId = 7, TimePenalty = 100 }
+                new Hint() { HintId = 7, ScenarioId = 2, HintText = "Hmm, let's look at the email account and find out if anything secret is hiding there", FlagId = 7, TimePenalty = 100 },
+
+                new Hint() { HintId = 8, ScenarioId = 3, HintText = "Try checking Suricata for any weird alerts", FlagId = 8, TimePenalty = 100 },
+                new Hint() { HintId = 9, ScenarioId = 3, HintText = "The Hive System should contain any clues for us to find", FlagId= 9, TimePenalty = 100 },
+                new Hint() { HintId = 10, ScenarioId = 3, HintText = "We should have eyes where the malware is located, let's try to figure out where to find the flag in there", FlagId = 10, TimePenalty = 100 }
                 );
 
         }

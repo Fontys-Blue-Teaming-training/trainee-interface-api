@@ -56,18 +56,18 @@ namespace trainee_interface_api.Contexts
 
             modelBuilder.Entity<Hint>()
                 .HasData(
-                new Hint() { HintId = 1, ScenarioId = 1, HintText = "Scout around in the Firewall Rule Section, try to look for the flag in one of the rules", FlagId = 1, TimePenalty = 100 },
-                new Hint() { HintId = 2, ScenarioId = 1, HintText = "Try to find the search query used during the traffic spoofing", FlagId = 2, TimePenalty = 100 },
-                new Hint() { HintId = 3, ScenarioId = 1, HintText = "Use the SOC to find alerts for more information", FlagId = 3, TimePenalty = 100 },
-                new Hint() { HintId = 4, ScenarioId = 1, HintText = "Find out who has been bruteforcing the system, maybe his username hides a clue", FlagId = 4, TimePenalty = 100 },
+                    new Hint() { HintId = 1, ScenarioId = 1, HintText = "Scout around in the Firewall Rule Section, try to look for the flag in one of the rules", FlagId = 1, TimePenalty = 100 },
+                    new Hint() { HintId = 2, ScenarioId = 1, HintText = "Try to find the search query used during the traffic spoofing", FlagId = 2, TimePenalty = 100 },
+                    new Hint() { HintId = 3, ScenarioId = 1, HintText = "Use the SOC to find alerts for more information", FlagId = 3, TimePenalty = 100 },
+                    new Hint() { HintId = 4, ScenarioId = 1, HintText = "Find out who has been bruteforcing the system, maybe his username hides a clue", FlagId = 4, TimePenalty = 100 },
 
-                new Hint() { HintId = 5, ScenarioId = 2, HintText = "Maybe the image that the actor has found, contains secret data", FlagId = 5, TimePenalty = 100 },
-                new Hint() { HintId = 6, ScenarioId = 2, HintText = "Let's find out if the actors journal hides something we haven't looked at yet!", FlagId = 6, TimePenalty = 100 },
-                new Hint() { HintId = 7, ScenarioId = 2, HintText = "Hmm, let's look at the email account and find out if anything secret is hiding there", FlagId = 7, TimePenalty = 100 },
+                    new Hint() { HintId = 5, ScenarioId = 2, HintText = "Read Chris' journal", FlagId = 5, TimePenalty = 100 },
+                    new Hint() { HintId = 6, ScenarioId = 2, HintText = "Analyse the email backups", FlagId = 6, TimePenalty = 100 },
+                    new Hint() { HintId = 7, ScenarioId = 2, HintText = "Take a look at the metadata from the images", FlagId = 7, TimePenalty = 100 },
 
-                new Hint() { HintId = 8, ScenarioId = 3, HintText = "Try checking Suricata for any weird alerts", FlagId = 8, TimePenalty = 100 },
-                new Hint() { HintId = 9, ScenarioId = 3, HintText = "The Hive System should contain any clues for us to find", FlagId= 9, TimePenalty = 100 },
-                new Hint() { HintId = 10, ScenarioId = 3, HintText = "We should have eyes where the malware is located, let's try to figure out where to find the flag in there", FlagId = 10, TimePenalty = 100 }
+                    new Hint() { HintId = 8, ScenarioId = 3, HintText = "Look at the SOC logs", FlagId = 8, TimePenalty = 100 },
+                    new Hint() { HintId = 9, ScenarioId = 3, HintText = "Take a look at the Hive", FlagId= 9, TimePenalty = 100 },
+                    new Hint() { HintId = 10, ScenarioId = 3, HintText = "Take a look at which ip address is affected", FlagId = 10, TimePenalty = 100 }
                 );
         }
     }

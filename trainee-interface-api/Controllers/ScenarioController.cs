@@ -52,7 +52,7 @@ namespace trainee_interface_api.Controllers
                 });
             }
 
-            highscore = highscore.OrderBy(x => x.TotalSeconds).ToList();
+            highscore = highscore.OrderByDescending(x => x.AmountOfFlags).ThenBy(x => x.TotalSeconds).ToList();
 
             return Ok(new ApiResponse<List<HighscoreEntry>>(true, highscore));
         }
@@ -151,7 +151,7 @@ namespace trainee_interface_api.Controllers
 
             if(hasStarted > 0 && hasStarted != toggleScenario.TeamIds.Length)
             {
-                return BadRequest(new ApiResponse<string>(false, $"Some (but not all) teams have already started this scenario!"));
+                return BadRequest(new ApiResponse<string>(false, "Some (but not all) teams have already started this scenario!"));
             }
 
             List<StartedScenario> startedScenarios = new List<StartedScenario>();

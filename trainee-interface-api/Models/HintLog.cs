@@ -15,7 +15,7 @@ namespace trainee_interface_api.Models
         [Required]
         public int ScenarioId { get; set; }
         [Required, DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-        public DateTime RecievedTime { get; set; }
+        public DateTime ReceivedTime { get; set; }
 
         public Hint Hint { get; set; }
 
